@@ -263,6 +263,10 @@ def generate_portfolio_template(resume_text):
     if not education:
         education = "Bachelor of Science in Computer Science"
     
+    # Generate skills HTML
+    skills_list = [s.strip() for s in skills.split(',')[:8]]
+    skills_html = '\n'.join([f'<span class="skill-tag">{skill}</span>' for skill in skills_list])
+    
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -450,7 +454,7 @@ def generate_portfolio_template(resume_text):
         <section id="skills">
             <h2>Skills & Expertise</h2>
             <div class="skill-tags">
-                {self._generate_skills_html(skills)}
+                {skills_html}
             </div>
         </section>
         
