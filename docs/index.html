@@ -3,14 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume to Portfolio</title>
-    <script>
-        // Redirect to app.html
-        window.location.href = './app.html';
-    </script>
+    <title>Resume to Portfolio - App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px 20px;
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+        
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: #f0f1ff;
+        }
+        
+        .upload-zone.dragging {
+            border-color: #764ba2;
+            background: #e8e9ff;
+            transform: scale(1.02);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .preview {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .preview iframe {
+            width: 100%;
+            min-height: 80vh;
+            border: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .file-info {
+            background: #e8f5e9;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: center;
+            color: #2e7d32;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+        
+        .message.error {
+            background: #ffcdd2;
+            color: #b71c1c;
+        }
+        
+        .api-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .preview {
+                max-height: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to Resume to Portfolio app...</p>
-    <p>If you are not redirected automatically, <a href="app.html">click here</a>.</p>
+    <div class="container">
+        <header>
+            <h1>Resume to Portfolio Generator</h1>
+            <p>Transform your resume into a stunning portfolio website</p>
+        </header>
+        
+        <div class="grid">
+            <section>
+                <h2>Upload Your Resume</h2>
+                
+                <div class="api-notice" id="apiNotice" style="display: none;">
+                    ⚙ Backend not connected. Please deploy backend to Render or Railway and update API URL.
+                </div>
+                
+                <div class="upload-zone" id="dropZone">
+                    <svg style="width: 48px; height: 48px; color: #667eea; margin-bottom: 15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p>Drag and drop your resume here or click to select</p>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 5px;">Supported: PDF, DOCX, DOC, TXT</p>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt">
+                </div>
+                
+                <div id="fileInfo" class="file-info" style="display: none;"></div>
+                
+                <button id="uploadBtn" disabled>Generate Portfolio</button>
+                
+                <div id="message" class="message" style="display: none;"></div>
+            </section>
+            
+            <section id="previewSection" style="display: none;">
+                <h2>Portfolio Preview</h2>
+                <a id="downloadBtn" href="#" download="portfolio.html" style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin-bottom: 20px;">⬇ Download HTML</a>
+                <div class="preview" id="preview"></div>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        // UPDATE THIS URL TO YOUR DEPLOYED BACKEND
+        // For example: https://resume2portfolio-api.onrender.com
+        const API_BASE_URL = 'https://resume2portfolio-api.onrender.com'; // Change this for production
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const message = document.getElementById('message');
+        const fileInfo = document.getElementById('fileInfo');
+        const previewSection = document.getElementById('previewSection');
+        const preview = document.getElementById('preview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const apiNotice = document.getElementById('apiNotice');
+        
+        let selectedFile = null;
+        
+        // Check if API is available
+        function checkAPI() {
+            fetch(`${API_BASE_URL}/api/upload`, { method: 'OPTIONS' })
+                .catch(() => {
+                    apiNotice.style.display = 'block';
+                    uploadBtn.disabled = true;
+                });
+        }
+        
+        // Check API on load
+        checkAPI();
+        
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragging');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+                showFileInfo();
+            }
+        });
+        
+        // Click to select
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                showFileInfo();
+            }
+        });
+        
+        function showFileInfo() {
+            uploadBtn.disabled = false;
+            fileInfo.style.display = 'block';
+            fileInfo.innerHTML = `<strong>${selectedFile.name}</strong><br>(${(selectedFile.size / 1024).toFixed(2)} KB)`;
+        }
+        
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showMessage('Please select a resume file', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            
+            showMessage('Generating your portfolio...', 'success');
+            uploadBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to generate portfolio');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Portfolio generated successfully!', 'success');
+                    previewSection.style.display = 'block';
+                    preview.innerHTML = `<iframe srcdoc="${escapeHtml(data.portfolio)}"></iframe>`;
+                    downloadBtn.href = `data:text/html;charset=utf-8,${encodeURIComponent(data.portfolio)}`;
+                } else {
+                    throw new Error(data.error || 'Failed to generate portfolio');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        });
+        
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>
