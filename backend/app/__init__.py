@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from config import config
 import os
@@ -22,6 +22,11 @@ def create_app(config_name=None):
     
     # Create upload folder if it doesn't exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
+    # Health check endpoint
+    @app.route('/', methods=['GET', 'HEAD'])
+    def health_check():
+        return jsonify({'status': 'ok', 'service': 'resume-to-portfolio-api'}), 200
     
     # Register blueprints
     from app.routes import upload_bp
