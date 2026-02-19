@@ -235,6 +235,7 @@ Resume: {resume_text}"""
 def generate_portfolio_template(resume_text):
     """
     Generate a professional portfolio template using the resume text
+    Version 2.1 - Fixed skills generation
     """
     
     # Extract information from resume (basic regex patterns)
