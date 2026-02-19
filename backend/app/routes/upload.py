@@ -14,7 +14,7 @@ def allowed_file(filename):
 def upload_resume():
     """
     Upload resume and generate portfolio HTML
-    Expected: multipart/form-data with 'resume' file field
+    Expected: multipart/form-data with 'resume' file field, 'model' and optional 'api_key' fields
     """
     try:
         # Check if file is present
@@ -29,6 +29,10 @@ def upload_resume():
         if not allowed_file(file.filename):
             return jsonify({'error': 'File type not allowed. Use PDF, DOC, DOCX, or TXT'}), 400
         
+        # Get model and API key from form data
+        model = request.form.get('model', 'offline')
+        api_key = request.form.get('api_key', '').strip()
+        
         # Save uploaded file
         filename = secure_filename(file.filename)
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -37,8 +41,8 @@ def upload_resume():
         # Extract text from resume (placeholder - implement based on file type)
         resume_text = extract_resume_text(filepath)
         
-        # Generate portfolio using Claude
-        portfolio_html = generate_portfolio(resume_text)
+        # Generate portfolio using specified model and API key
+        portfolio_html = generate_portfolio(resume_text, model=model, api_key=api_key)
         
         # Clean up uploaded file
         os.remove(filepath)

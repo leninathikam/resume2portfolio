@@ -11,8 +11,14 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
-    # Enable CORS
-    CORS(app, origins=[os.getenv('FRONTEND_URL', 'http://localhost:3000')])
+    # Enable CORS with multiple origins
+    allowed_origins = [
+        'http://localhost:3000',
+        'http://localhost:5000',
+        'https://leninathikam.github.io',
+        os.getenv('FRONTEND_URL', 'http://localhost:3000')
+    ]
+    CORS(app, origins=allowed_origins)
     
     # Create upload folder if it doesn't exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

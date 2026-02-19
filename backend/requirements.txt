@@ -2,5 +2,11 @@ Flask==3.0.0
 Flask-CORS==4.0.0
 python-dotenv==1.0.0
 Werkzeug==3.0.0
-anthropic>=0.17.0
 pydantic>=2.0.0
+requests>=2.31.0
+
+# LLM Provider SDKs (install as needed)
+anthropic>=0.17.0  # Claude API
+google-generativeai>=0.3.0  # Google Gemini
+openai>=1.0.0  # OpenAI GPT
+groq>=0.4.0  # Groq

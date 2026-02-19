@@ -1,42 +1,235 @@
 import os
-import re
+from typing import Optional
 
-def generate_portfolio(resume_text):
+
+def generate_portfolio(resume_text: str, model: Optional[str] = None, api_key: Optional[str] = None) -> str:
     """
-    Generate portfolio HTML from resume text
-    Works offline without Claude API
+    Generate portfolio HTML from resume text using configured LLM
+    
+    Supports: Claude, Gemini, GPT, Llama, Qwen, Groq, and more!
     
     Args:
         resume_text: Extracted text from resume
+        model: Optional model override
+        api_key: Optional API key (overrides environment variable)
     
     Returns:
         HTML string for portfolio website
     """
     
-    # Try to use Claude API if available
-    use_api = os.getenv('USE_CLAUDE_API', 'false').lower() == 'true'
-    api_key = os.getenv('CLAUDE_API_KEY')
+    # Get model configuration
+    configured_model = model or os.getenv('LLM_MODEL', 'offline')
     
-    if use_api and api_key:
+    # Determine if we should use API (if model is not offline or api_key is provided)
+    if api_key or (configured_model != 'offline' and os.getenv('USE_LLM_API', 'false').lower() == 'true'):
         try:
-            import anthropic
-            client = anthropic.Anthropic(api_key=api_key)
-            
-            prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. Include: header, about, skills, experience, education, and footer. Use modern CSS, responsive design, and professional colors. Return only the HTML with embedded CSS starting with <!DOCTYPE html>
+            html = call_llm_api(resume_text, configured_model, api_key)
+            if html:
+                return html
+        except Exception as e:
+            print(f"LLM API error: {e}. Using offline template.")
+    
+    # Otherwise use template mode
+    return generate_portfolio_template(resume_text)
+
+
+def call_llm_api(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """
+    Call various LLM APIs based on model selection
+    
+    Supported providers:
+    - Google: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash
+    - OpenAI: gpt-5-mini, gpt-5-nano, gpt-4.1-mini
+    - Meta: llama-3.3-70b, llama-4-scout, llama-4-maverick  
+    - Groq: groq/compound, groq/compound-mini
+    - Alibaba: qwen/qwen3-32b
+    """
+    
+    if model.startswith('gemini'):
+        return call_google_gemini(resume_text, model, api_key)
+    elif model.startswith('gpt'):
+        return call_openai(resume_text, model, api_key)
+    elif model.startswith('llama') or 'llama' in model:
+        return call_llama_model(resume_text, model, api_key)
+    elif model.startswith('qwen'):
+        return call_alibaba(resume_text, model, api_key)
+    elif model.startswith('groq'):
+        return call_groq(resume_text, model, api_key)
+    
+    return None
+
+
+def call_google_gemini(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Google Gemini API"""
+    try:
+        import google.generativeai as genai
+        
+        api_key = api_key or os.getenv('GOOGLE_API_KEY')
+        if not api_key:
+            print("GOOGLE_API_KEY not set")
+            return None
+        
+        genai.configure(api_key=api_key)
+        client = genai.GenerativeModel(model)
+        
+        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
+Include: header, about, skills, experience, education, and footer. 
+Use modern CSS, responsive design, and professional colors. 
+Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
 
 Resume: {resume_text}"""
-            
-            message = client.messages.create(
-                model=os.getenv('CLAUDE_MODEL', 'claude-3-5-sonnet-20241022'),
-                max_tokens=4096,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return message.content[0].text
-        except Exception as e:
-            print(f"Claude API error: {e}. Using template mode.")
-    
-    # Generate default portfolio from resume text
-    return generate_portfolio_template(resume_text)
+        
+        response = client.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"Google Gemini error: {e}")
+        return None
+
+
+def call_openai(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call OpenAI API"""
+    try:
+        from openai import OpenAI
+        
+        api_key = api_key or os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            print("OPENAI_API_KEY not set")
+            return None
+        
+        client = OpenAI(api_key=api_key)
+        
+        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
+Include: header, about, skills, experience, education, and footer. 
+Use modern CSS, responsive design, and professional colors. 
+Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+
+Resume: {resume_text}"""
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=4096,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"OpenAI error: {e}")
+        return None
+
+
+def call_groq(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Groq API (fast inference)"""
+    try:
+        from groq import Groq
+        
+        api_key = api_key or os.getenv('GROQ_API_KEY')
+        if not api_key:
+            print("GROQ_API_KEY not set")
+            return None
+        
+        client = Groq(api_key=api_key)
+        
+        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from this resume.
+Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+
+Resume: {resume_text}"""
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=4096
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Groq error: {e}")
+        return None
+
+
+def call_llama_model(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Llama models via Together AI or Groq"""
+    try:
+        # Try Together AI first
+        if 'togethercomputer' in model or 'together' in model.lower():
+            return call_together_api(resume_text, model, api_key)
+        # Otherwise try Groq
+        else:
+            return call_groq(resume_text, model, api_key)
+    except Exception as e:
+        print(f"Llama model error: {e}")
+        return None
+
+
+def call_together_api(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Together AI API for Llama and other models"""
+    try:
+        import requests
+        
+        api_key = api_key or os.getenv('TOGETHER_API_KEY')
+        if not api_key:
+            print("TOGETHER_API_KEY not set")
+            return None
+        
+        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from resume.
+Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+
+Resume: {resume_text}"""
+        
+        response = requests.post(
+            "https://api.together.xyz/inference",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "model": model,
+                "prompt": prompt,
+                "max_tokens": 4096,
+                "temperature": 0.7,
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if 'output' in data:
+                return data['output']['choices'][0]['text']
+        return None
+    except Exception as e:
+        print(f"Together AI error: {e}")
+        return None
+
+
+def call_alibaba(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Alibaba Qwen API"""
+    try:
+        import requests
+        
+        api_key = api_key or os.getenv('ALIBABA_API_KEY')
+        if not api_key:
+            print("ALIBABA_API_KEY not set")
+            return None
+        
+        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from resume.
+Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+
+Resume: {resume_text}"""
+        
+        response = requests.post(
+            "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "model": model,
+                "input": {"messages": [{"role": "user", "content": prompt}]},
+                "parameters": {"max_tokens": 4096}
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if 'output' in data:
+                return data['output']['text']
+        return None
+    except Exception as e:
+        print(f"Alibaba error: {e}")
+        return None
 
 
 def generate_portfolio_template(resume_text):
