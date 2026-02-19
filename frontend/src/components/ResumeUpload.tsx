@@ -10,6 +10,8 @@ interface ResumeUploadProps {
 
 const LLM_MODELS = [
   { label: 'Offline Mode (No API needed)', value: 'offline' },
+  { label: 'Euron.ai GPT-4.1 Nano (Free!)', value: 'euron:gpt-4.1-nano' },
+  { label: 'Euron.ai GPT-4.1 Mini (Free!)', value: 'euron:gpt-4.1-mini' },
   { label: 'Google Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
   { label: 'Google Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
   { label: 'OpenAI GPT-4.1 Mini', value: 'gpt-4.1-mini' },

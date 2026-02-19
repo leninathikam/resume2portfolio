@@ -38,6 +38,7 @@ def call_llm_api(resume_text: str, model: str, api_key: Optional[str] = None) ->
     Call various LLM APIs based on model selection
     
     Supported providers:
+    - Euron.ai: euron:gpt-4.1-nano, euron:gpt-4.1-mini (FREE - 10k tokens/day!)
     - Google: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash
     - OpenAI: gpt-5-mini, gpt-5-nano, gpt-4.1-mini
     - Meta: llama-3.3-70b, llama-4-scout, llama-4-maverick  
@@ -45,7 +46,9 @@ def call_llm_api(resume_text: str, model: str, api_key: Optional[str] = None) ->
     - Alibaba: qwen/qwen3-32b
     """
     
-    if model.startswith('gemini'):
+    if model.startswith('euron'):
+        return call_euron_ai(resume_text, model, api_key)
+    elif model.startswith('gemini'):
         return call_google_gemini(resume_text, model, api_key)
     elif model.startswith('gpt'):
         return call_openai(resume_text, model, api_key)
@@ -57,6 +60,52 @@ def call_llm_api(resume_text: str, model: str, api_key: Optional[str] = None) ->
         return call_groq(resume_text, model, api_key)
     
     return None
+
+
+def call_euron_ai(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Call Euron.ai API (OpenAI-compatible, FREE 10k tokens/day)"""
+    try:
+        import requests
+        
+        api_key = api_key or os.getenv('EURON_API_KEY')
+        if not api_key:
+            print("EURON_API_KEY not set")
+            return None
+        
+        # Extract model name (format: euron:gpt-4.1-nano)
+        model_name = model.split(':')[1] if ':' in model else model
+        
+        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
+Include: header, about, skills, experience, education, and footer. 
+Use modern CSS, responsive design, and professional colors. 
+Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+
+Resume: {resume_text}"""
+        
+        response = requests.post(
+            'https://api.euron.one/api/v1/euri/chat/completions',
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'messages': [{'role': 'user', 'content': prompt}],
+                'model': model_name,
+                'temperature': 0.7,
+                'max_tokens': 4096
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data['choices'][0]['message']['content']
+        else:
+            print(f"Euron.ai error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"Euron.ai error: {e}")
+        return None
 
 
 def call_google_gemini(resume_text: str, model: str, api_key: Optional[str] = None) -> Optional[str]:
