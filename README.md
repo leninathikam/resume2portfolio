@@ -2,17 +2,25 @@
 
 Transform your resume into a stunning, professional portfolio website using Claude AI.
 
+## 🚀 Live Demo
+
+- **Frontend**: https://leninathikam.github.io/resume2portfolio/
+- **Docs**: [QUICK_DEPLOY.md](QUICK_DEPLOY.md) - Deploy in 5 minutes!
+- **Full Guide**: [DEPLOYMENT.md](DEPLOYMENT.md) - Complete deployment instructions
+
 ## Project Overview
 
-This application takes your resume as input and uses Claude LLM to generate beautiful, responsive HTML portfolio code. The generated portfolio is immediately viewable and downloadable.
+This application takes your resume as input and generates beautiful, responsive HTML portfolio code. The generated portfolio is immediately viewable and downloadable. Works offline (no API key required) or with Claude AI.
 
 ### Features
 - 📄 **Resume Upload**: Support for PDF, DOCX, DOC, and TXT files
-- 🤖 **AI-Powered Generation**: Uses Claude API to analyze resumes and create custom portfolios
+- 🤖 **AI-Powered Generation**: Uses AI to generate custom portfolios (optional)
 - 🎨 **Professional Design**: Modern, responsive HTML/CSS portfolio templates
 - 👀 **Live Preview**: View your portfolio in real-time
 - ⬇️ **Download**: Download the generated HTML file
 - 📱 **Responsive**: Mobile-friendly portfolio design
+- ✅ **Offline Mode**: Works without any API key or backend
+- 🆓 **Free Hosting**: Deploy on GitHub Pages + Render/Railway for free
 
 ## Tech Stack
 
@@ -136,6 +144,20 @@ yarn start
 ```
 
 The frontend will open at `http://localhost:3000`
+
+## Deployment
+
+### Quick Deploy (5 minutes)
+See **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** for rapid deployment steps:
+- Frontend → GitHub Pages (automatic)
+- Backend → Render or Railway (free tier)
+
+### Full Deployment Guide
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for complete instructions with:
+- Step-by-step GitHub Pages setup
+- Render deployment with free tier
+- Railway.app alternative
+- Testing & troubleshooting
 
 ## Usage
 
