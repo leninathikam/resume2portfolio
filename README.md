@@ -1,6 +1,6 @@
 # Resume to Portfolio Website Generator
 
-Transform your resume into a stunning, professional portfolio website using Claude AI.
+Transform your resume into a stunning, professional portfolio website using any LLM.
 
 ## 🚀 Live Demo
 
@@ -10,7 +10,7 @@ Transform your resume into a stunning, professional portfolio website using Clau
 
 ## Project Overview
 
-This application takes your resume as input and generates beautiful, responsive HTML portfolio code. The generated portfolio is immediately viewable and downloadable. Works offline (no API key required) or with Claude AI.
+This application takes your resume as input and generates beautiful, responsive HTML portfolio code. The generated portfolio is immediately viewable and downloadable. Works offline (no API key required) or with LLm(openai, gemini, claude, grok).
     
 ### Features
 - 📄 **Resume Upload**: Support for PDF, DOCX, DOC, and TXT files
@@ -26,7 +26,7 @@ This application takes your resume as input and generates beautiful, responsive 
 
 ### Backend
 - **Framework**: Flask (Python)
-- **LLM**: Anthropic Claude API
+- **LLM**: openai, gemini, claude, grok
 - **File Handling**: Werkzeug
 - **API**: RESTful with CORS support
 
@@ -47,7 +47,7 @@ resume2portfolio/
 │   │   │   ├── upload.py      # Resume upload endpoint
 │   │   │   └── __init__.py
 │   │   ├── services/          # Business logic
-│   │   │   ├── llm_service.py # Claude integration
+│   │   │   ├── llm_service.py # LLM integration
 │   │   │   └── __init__.py
 │   │   └── models/            # Data models (if needed)
 │   ├── uploads/               # Temporary file storage
@@ -82,7 +82,7 @@ resume2portfolio/
 - Python 3.9+
 - Node.js 16+
 - npm or yarn
-- Claude API key from Anthropic
+- LLM API key from provider
 
 ### Backend Setup
 
@@ -109,7 +109,7 @@ cp .env.example .env
 
 5. Edit `.env` and add your Claude API key:
 ```
-CLAUDE_API_KEY=your_api_key_here
+LLM_API_KEY=your_api_key_here
 FLASK_ENV=development
 FLASK_DEBUG=True
 FRONTEND_URL=http://localhost:3000
