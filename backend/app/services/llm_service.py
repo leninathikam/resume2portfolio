@@ -75,10 +75,17 @@ def call_euron_ai(resume_text: str, model: str, api_key: Optional[str] = None) -
         # Extract model name (format: euron:gpt-4.1-nano)
         model_name = model.split(':')[1] if ':' in model else model
         
-        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
-Include: header, about, skills, experience, education, and footer. 
-Use modern CSS, responsive design, and professional colors. 
-Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""You are an expert web designer. Create ADVANCED RESPONSIVE HTML5 portfolio that is UNIQUE with enriched modern features.
+
+Extract: Name, title, email, phone, location, summary, ALL work experience (3-5 achievements), ALL education, technical skills grouped by category, soft skills, certifications.
+
+Design: Animated hero with gradient background, sticky mobile navigation, experience timeline or cards with badges, skill progress bars grouped by category, education cards, professional about section, contact with social links. Add subtle animations, hover effects, CSS gradients, responsive grid layouts. Fully responsive on mobile/tablet/desktop.
+
+Color scheme: Professional 2-3 colors with good contrast. Typography: 2-3 font families using system fonts or Google Fonts @import. Include boxes shadows, smooth transitions, custom scrollbar.
+
+Create DIFFERENT design each time - vary layout, colors, and style (modern minimalist, dark professional, colorful creative, card-based, timeline, parallax).
+
+ONLY complete HTML5 with embedded CSS. NO external dependencies, NO images. Starting <!DOCTYPE html>, NO markdown.
 
 Resume: {resume_text}"""
         
@@ -91,7 +98,7 @@ Resume: {resume_text}"""
             json={
                 'messages': [{'role': 'user', 'content': prompt}],
                 'model': model_name,
-                'temperature': 0.7,
+                'temperature': 0.8,
                 'max_tokens': 4096
             },
             timeout=30
@@ -121,12 +128,58 @@ def call_google_gemini(resume_text: str, model: str, api_key: Optional[str] = No
         genai.configure(api_key=api_key)
         client = genai.GenerativeModel(model)
         
-        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
-Include: header, about, skills, experience, education, and footer. 
-Use modern CSS, responsive design, and professional colors. 
-Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""You are an expert web designer and developer. Generate an ADVANCED, RESPONSIVE, PROFESSIONAL HTML5 portfolio website that is UNIQUE and ENRICHED with modern features.
 
-Resume: {resume_text}"""
+=== DATA EXTRACTION ===
+Carefully extract from resume: Full name, professional title, email, phone, location, professional summary, ALL work experience, ALL education, ALL technical skills grouped by category, certifications, awards.
+
+=== DESIGN FEATURES (ADVANCED) ===
+1. HEADER/HERO: Animated gradient, clear name/title, smooth scroll indicator, mobile navigation
+2. NAVIGATION: Sticky header, hamburger menu for mobile, active section highlighting
+3. EXPERIENCE: Timeline or cards with company badges, job title, dates, 3-5 achievements, hover effects
+4. SKILLS: Progress bars with visual indicators, grouped by category, color-coded, responsive grid
+5. EDUCATION: Clean cards, degree, institution, graduation date, GPA, relevant coursework
+6. ABOUT: Professional bio (100-200 words), key highlights, photo placeholder
+7. CONTACT: Email, phone, social links, contact form, download resume button
+
+=== RESPONSIVE DESIGN ===
+- Mobile-first approach (perfect on phones)
+- Tablet optimizations
+- Desktop enhancements
+- CSS Grid/Flexbox layouts
+- Responsive fonts (rem/em units)
+- Touch-friendly buttons (44px min height)
+- No horizontal scrolling
+
+=== ADVANCED CSS FEATURES ===
+- Subtle animations (fade-in, slide effects)
+- Hover effects (cards lift, color changes)
+- Smooth transitions
+- Box shadows for depth
+- CSS gradients
+- Custom scrollbar styling
+
+=== COLOR & STYLING ===
+- Professional 2-3 color scheme
+- High contrast for readability
+- 2-3 font families
+- White space for breathing room
+- Icon usage for hierarchy
+
+=== UNIQUE DESIGN VARIATION ===
+Create DIFFERENT design each time: Modern minimalist, Colorful creative, Dark professional, Card-based, Timeline, Parallax
+
+=== OUTPUT ===
+- Complete valid HTML5
+- ALL CSS embedded in <style>
+- NO external dependencies
+- System fonts or Google Fonts @import
+- Inline SVG for icons
+- Starting with <!DOCTYPE html>
+- ONLY HTML, NO markdown
+
+Resume:
+{resume_text}"""
         
         response = client.generate_content(prompt)
         return response.text
@@ -147,18 +200,115 @@ def call_openai(resume_text: str, model: str, api_key: Optional[str] = None) -> 
         
         client = OpenAI(api_key=api_key)
         
-        prompt = f"""You are a professional web designer. Generate a beautiful, responsive HTML5 portfolio website from this resume. 
-Include: header, about, skills, experience, education, and footer. 
-Use modern CSS, responsive design, and professional colors. 
-Return ONLY the HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""You are an expert web designer and developer. Generate an ADVANCED, RESPONSIVE, PROFESSIONAL HTML5 portfolio website that is UNIQUE and ENRICHED with modern features.
 
-Resume: {resume_text}"""
+=== DATA EXTRACTION ===
+Carefully extract from resume:
+- Full name, professional title, email, phone, location
+- Professional summary/objective
+- ALL work experience (company, title, duration, 3+ achievements per job)
+- ALL education (degree, institution, graduation date, GPA if present)
+- ALL technical skills (group by category: languages, frameworks, tools, etc.)
+- Soft skills (communication, leadership, teamwork, etc.)
+- Certifications, awards, projects, publications
+
+=== DESIGN FEATURES (ADVANCED) ===
+
+1. HEADER/HERO SECTION:
+   - Full-screen or large call-to-action area
+   - Animated gradient background OR subtle pattern
+   - Clear name, title, and tagline
+   - Smooth scroll indicator
+   - Mobile-optimized navigation
+
+2. NAVIGATION:
+   - Sticky header with smooth scrolling
+   - Hamburger menu for mobile
+   - Active section highlighting
+
+3. EXPERIENCE SECTION:
+   - Timeline layout or card-based design
+   - Company logo placeholder or colored company badges
+   - Job title as heading
+   - Date range with duration calculation
+   - 3-5 bullet points per job
+   - Hover effects on cards (desktop)
+
+4. SKILLS SECTION:
+   - Skill progress bars/visual indicators (0-100%)
+   - Skills grouped by category (Technical, Languages, Tools, Soft Skills)
+   - Color-coded skill categories
+   - Responsive grid layout
+   - Optional: Skill proficiency levels
+
+5. EDUCATION SECTION:
+   - Clean card layout
+   - Institution name, degree, field
+   - Graduation date
+   - GPA if present
+   - Relevant coursework or achievements
+
+6. ABOUT SECTION:
+   - Professional biography (100-200 words)
+   - Key highlights or achievements
+   - Professional photo placeholder
+   - Call-to-action button
+
+7. CONTACT SECTION:
+   - Email, phone, LinkedIn, GitHub (if available)
+   - Simple contact form HTML (action can be placeholder)
+   - Social media icons with hover effects
+   - Download resume button (href=#)
+
+=== RESPONSIVE DESIGN REQUIREMENTS ===
+- Mobile-first approach (works perfectly on phones)
+- Tablet optimizations (medium screens)
+- Desktop enhancements (large screens)
+- Flexible layouts using CSS Grid/Flexbox
+- Responsive font sizes (using rem/em units)
+- Touch-friendly buttons (min 44px height)
+- No horizontal scrolling on any device
+- Proper spacing and padding for all screen sizes
+
+=== ADVANCED CSS FEATURES ===
+- Subtle animations (fade-in, slide effects on scroll)
+- Hover effects (cards lift, text changes color)
+- Smooth transitions between colors/states
+- Box shadows for depth
+- CSS gradients for visual appeal
+- Custom scrollbar styling
+- Loading animations
+
+=== COLOR & STYLING ===
+- Professional color scheme (2-3 main colors + accent)
+- High contrast for readability
+- Consistent typography (2-3 font families)
+- White space for visual breathing room
+- Icon usage for visual hierarchy
+
+=== UNIQUE DESIGN VARIATION ===
+- Create a DIFFERENT design style each time
+- Options: Modern minimalist, Colorful creative, Dark mode professional, Card-based, Timeline, Parallax effects
+- Use different layouts, color schemes, and typography for variety
+
+=== OUTPUT REQUIREMENTS ===
+- Complete, valid HTML5 document
+- ALL CSS embedded in <style> tag
+- NO external dependencies, NO images, NO external fonts
+- Use system fonts or Google Fonts @import
+- Inline SVG for icons if needed
+- Self-contained and deployable
+- Starting with <!DOCTYPE html>
+- NO markdown, NO explanations, ONLY HTML
+
+Resume:
+{resume_text}"""
         
         response = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=4096,
-            temperature=0.7
+            temperature=0.9
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -178,8 +328,11 @@ def call_groq(resume_text: str, model: str, api_key: Optional[str] = None) -> Op
         
         client = Groq(api_key=api_key)
         
-        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from this resume.
-Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""You are an expert web designer. Generate ADVANCED RESPONSIVE HTML5 portfolio with enriched features.
+
+Extract from resume: Name, title, email, phone, summary, ALL experience (3-5 achievements each), ALL education, technical skills (grouped), soft skills, certifications.
+
+Design with: Animated hero section, sticky nav, experience timeline/cards, skill progress bars, education cards, about section, contact section. Include subtle animations, hover effects, gradients, 2-3 color scheme. Make fully responsive (mobile, tablet, desktop). NO external files. ONLY HTML starting <!DOCTYPE html>.
 
 Resume: {resume_text}"""
         
@@ -218,8 +371,7 @@ def call_together_api(resume_text: str, model: str, api_key: Optional[str] = Non
             print("TOGETHER_API_KEY not set")
             return None
         
-        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from resume.
-Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""Design ADVANCED RESPONSIVE HTML5 portfolio with enriched features. Extract: Name, title, email, phone, summary, ALL experience (3-5 achievements), ALL education, skills grouped, certifications. Design: Animated hero, sticky nav, experience timeline/cards, skill bars, education cards. Responsive mobile/tablet/desktop. Subtle animations, hover effects, gradients, 2-3 color scheme. ONLY HTML starting <!DOCTYPE html>. NO external files.
 
 Resume: {resume_text}"""
         
@@ -230,7 +382,7 @@ Resume: {resume_text}"""
                 "model": model,
                 "prompt": prompt,
                 "max_tokens": 4096,
-                "temperature": 0.7,
+                "temperature": 0.8,
             },
             timeout=30
         )
@@ -255,8 +407,7 @@ def call_alibaba(resume_text: str, model: str, api_key: Optional[str] = None) ->
             print("ALIBABA_API_KEY not set")
             return None
         
-        prompt = f"""You are a professional web designer. Generate beautiful HTML5 portfolio from resume.
-Return ONLY HTML with embedded CSS starting with <!DOCTYPE html> and nothing else.
+        prompt = f"""Design ADVANCED RESPONSIVE HTML5 portfolio. Extract: Name, title, email, phone, summary, ALL experience, ALL education, skills grouped, certifications. Create: Hero section with animation, sticky nav, experience timeline/cards, skill progress bars, education cards, about, contact. Responsive mobile/tablet/desktop. Animations, hover effects, gradients, 2-3 colors. ONLY HTML <!DOCTYPE html>. NO external files.
 
 Resume: {resume_text}"""
         

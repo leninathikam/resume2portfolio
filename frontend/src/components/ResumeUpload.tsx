@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './ResumeUpload.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 interface ResumeUploadProps {
   onPortfolioGenerated: (html: string) => void;
   onError: (error: string) => void;
@@ -10,12 +12,12 @@ interface ResumeUploadProps {
 
 const LLM_MODELS = [
   { label: 'Offline Mode (No API needed)', value: 'offline' },
-  { label: 'Euron.ai GPT-4.1 Nano (Free!)', value: 'euron:gpt-4.1-nano' },
-  { label: 'Euron.ai GPT-4.1 Mini (Free!)', value: 'euron:gpt-4.1-mini' },
+  { label: 'OpenAI GPT-4o', value: 'gpt-4o' },
+  { label: 'OpenAI GPT-4o Mini (Recommended)', value: 'gpt-4o-mini' },
+  { label: 'OpenAI GPT-4 Turbo', value: 'gpt-4-turbo' },
+  { label: 'OpenAI GPT-3.5 Turbo', value: 'gpt-3.5-turbo' },
   { label: 'Google Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
   { label: 'Google Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
-  { label: 'OpenAI GPT-4.1 Mini', value: 'gpt-4.1-mini' },
-  { label: 'OpenAI GPT-5 Mini', value: 'gpt-5-mini' },
   { label: 'Meta Llama 3.3 70B', value: 'llama-3.3-70b' },
   { label: 'Groq Compound', value: 'groq/compound' },
   { label: 'Alibaba Qwen 3 32B', value: 'qwen/qwen3-32b' },
@@ -65,11 +67,6 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({
       return;
     }
 
-    if (selectedModel !== 'offline' && !apiKey.trim()) {
-      setMessage('Please enter an API key for the selected model');
-      return;
-    }
-
     const formData = new FormData();
     formData.append('resume', file);
     formData.append('model', selectedModel);
@@ -81,7 +78,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({
       onLoading(true);
       setMessage('Generating your portfolio...');
 
-      const response = await axios.post('/api/upload', formData, {
+      const response = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

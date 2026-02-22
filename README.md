@@ -11,7 +11,7 @@ Transform your resume into a stunning, professional portfolio website using Clau
 ## Project Overview
 
 This application takes your resume as input and generates beautiful, responsive HTML portfolio code. The generated portfolio is immediately viewable and downloadable. Works offline (no API key required) or with Claude AI.
-
+    
 ### Features
 - 📄 **Resume Upload**: Support for PDF, DOCX, DOC, and TXT files
 - 🤖 **AI-Powered Generation**: Uses AI to generate custom portfolios (optional)
